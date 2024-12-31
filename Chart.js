@@ -1,6 +1,6 @@
 var ctx = document.getElementById("myLineChart").getContext('2d');
 let playersMS1;
-let playersMS2;
+let playersMS2;     //Już nie ma
 let playersHC;
 let playersTeams;
 let players1vs1;
