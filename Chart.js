@@ -1,44 +1,32 @@
 var ctx = document.getElementById("myLineChart").getContext('2d');
-let playersMS1;
-let playersMS2;     //Już nie ma
-let playersHC;        //Tego też
-let playersTeams;    //brak
-let players1vs1;
-let players2vs2;
+let playersMS1 = [];
+let playersHC = [];
 let currentData;
 let myLineChart;
+let time;
 
     fetch('https://api.codetabs.com/v1/proxy?quest=https://bubbleam.pl/players')
-        .then(response => response.json())
-        .then(data => {
-            playersMS1 = data['443'].sort((a, b) => a[0] - b[0]);
-            while (playersMS1[0] === 0) playersMS1.shift();
-
-            const startTimestamp = 1724095608000;           // GMT: Monday, 19 August 2024 19:26:48, moment zmiany formatu danych,
-                                                            // zapisywanie co minutę i tylko wartości różnych od zera
-            
-            function fillMissingMinutes(data, startTimestamp) {         // Funkcja do uzupełniania brakujących minut
-                const filledData = [];
-
-                let index = 0;
-                while (data[index][0] < startTimestamp) {     //omijamy dane z przed 19.08.2024
-                    filledData[index] = data[index];
-                    index++;
-                }
-                let prevTimestamp = data[index][0];                 //ust. poprzedni timestamp
-                index++;
-                for (; index < data.length; index++) {
-                    let timestamp = data[index][0];             //ust. timestamp
-                    for (let ts = prevTimestamp + 60000; (ts+40000) < timestamp; ts += 60000) {    //jeśli różnica 100sekund
-                        filledData.push([ts, 0]);                                           // to dodajemy minutę z zerem
-                    }
-                    filledData.push(data[index]);                           //jeśli nie to przepisujemy dane
-                    prevTimestamp = timestamp;
-                }
-                return filledData;
+        .then(response => {
+            if(!response.ok){
+                throw new Error(`HTTP error! Status: ${response.status}`)
             }
-            // Przekształcanie danych
-            playersMS1 = fillMissingMinutes(playersMS1, startTimestamp);
+            return response.text();
+        })
+        .then(csv => {
+            const stats = csv.split('\n');
+            stats.forEach(el => {
+                if(el.indexOf(',') == -1) {
+                    time = parseInt(el);
+                    playersMS1.push([time, 0]);
+                }
+                else {
+                    ammountArr = el.split(',').map(Number);
+                    ammountArr.forEach(elem => {
+                        time += 60000;
+                        playersMS1.push([time, elem]);
+                    })
+                }
+            });
 
             const colorOfDay = ['red', 'yellow', 'pink', 'orange', 'purple', 'green', 'blue'];
             
@@ -134,28 +122,7 @@ let myLineChart;
                     }
                 }
             });
-            {
-            playersMS2 = data['2053'].sort((a, b) => a[0] - b[0]);
-            while (playersMS2[0] === 0) playersMS2.shift();
-            playersMS2 = fillMissingMinutes(playersMS2, startTimestamp);
-
-            playersHC = data['2083'].sort((a, b) => a[0] - b[0]);
-            while (playersHC[0] === 0) playersHC.shift();
-            playersHC = fillMissingMinutes(playersHC, startTimestamp);
-
-            playersTeams = data['2096'].sort((a, b) => a[0] - b[0]);
-            while (playersTeams[0] < 5) playersTeams.shift();
-            playersTeams = fillMissingMinutes(playersTeams, startTimestamp);
-
-            players1vs1 = data['8443'].sort((a, b) => a[0] - b[0]);
-            while (players1vs1[0] === 0) players1vs1.shift();
-            players1vs1 = fillMissingMinutes(players1vs1, startTimestamp);
-
-            players2vs2 = data['2087'].sort((a, b) => a[0] - b[0]);
-            while (players2vs2[0] === 0) players2vs2.shift();
-            players2vs2 = fillMissingMinutes(players2vs2, startTimestamp);
-            currentData = playersMS1;
-            }  
+            
             currentData = playersMS1;
         })
     .catch(error => console.error('Błąd pobierania danych:', error));
@@ -222,70 +189,14 @@ function bottomBtnAction(numAvgHour, activeBtn) {
     myLineChart.data.labels = Labels2;
     myLineChart.update();
 };
-
-{
     document.getElementById('MS1').addEventListener('click', () => {
         topBtnAction(playersMS1, 'MS1');
     });
 
-    document.getElementById('MS2').addEventListener('click', () => {
-        topBtnAction(playersMS2, 'MS2');
-    });
-
-    document.getElementById('HC').addEventListener('click', () => {
-        topBtnAction(playersHC, 'HC');
-    });
-
-    document.getElementById('Teams').addEventListener('click', () => {
-        topBtnAction(playersTeams, 'Teams');
-    });
-
-    document.getElementById('1vs1').addEventListener('click', () => {
-        topBtnAction(players1vs1, '1vs1');
-    });
-
-    document.getElementById('2vs2').addEventListener('click', () => {
-        topBtnAction(players2vs2, '2vs2');
-    });
-}       //top-button
-
-{       //bottom-button
-    document.getElementById('av1').addEventListener('click', () => {
-        bottomBtnAction(1, 'av1');
-    });
-
-    document.getElementById('av2').addEventListener('click', () => {
-        bottomBtnAction(2, 'av2');
-    });
-    document.getElementById('av3').addEventListener('click', () => {
-        bottomBtnAction(3, 'av3');
-    });
-
-    document.getElementById('av4').addEventListener('click', () => {
-        bottomBtnAction(4, 'av4');
-    });
-
-    document.getElementById('av6').addEventListener('click', () => {
-        bottomBtnAction(6, 'av6');
-    });
-
-    document.getElementById('av12').addEventListener('click', () => {
-        bottomBtnAction(12, 'av12');
-    });
-    
-    document.getElementById('avD').addEventListener('click', () => {
-        bottomBtnAction(24, 'avD');
-    });
-
-    document.getElementById('avW').addEventListener('click', () => {
-        bottomBtnAction(168, 'avW');
-    });
-
-    document.getElementById('avM').addEventListener('click', () => {
-        bottomBtnAction(732, 'avM');
-    });
-
-    document.getElementById('avY').addEventListener('click', () => {
-        bottomBtnAction(8760, 'avY');
-    });
-}     //bottom-button
+    const bottomButton = document.querySelectorAll('.bottom-buttons button');
+    bottomButton.forEach((butt => {
+        butt.addEventListener('click',() => {
+            let hn = butt.getAttribute('hn');
+            bottomBtnAction(parseInt(hn), butt.id);
+        })
+    }));
