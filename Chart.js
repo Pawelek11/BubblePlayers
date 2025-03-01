@@ -27,15 +27,21 @@ let time;
                     })
                 }
             });
-
-            const colorOfDay = ['red', 'yellow', 'pink', 'orange', 'purple', 'green', 'blue'];
-            
+            playersMS1 = playersMS1.filter(t => t[0]>1000000000000);
+            //const colorOfDay = ['red', 'yellow', 'pink', 'orange', 'purple', 'green', 'blue'];
+            //const colorOfDay = ['#ff4c4c', '#ffcc00', '#ff66b2', '#ff884d', '#b266ff', '#33cc33', '#3399ff'];
+            //const colorOfDay = ['#ff1744', '#ffea00', '#f50057', '#ff6d00', '#d500f9', '#00e676', '#2979ff'];
+            const colorOfDay = ['rgba(255, 71, 71, 0.8)', 'rgba(255, 230, 0, 0.8)', 'rgba(255, 51, 153, 0.8)', 
+                'rgba(255, 102, 51, 0.8)', 'rgba(153, 102, 255, 0.8)', 'rgba(51, 204, 51, 0.8)', 
+                'rgba(51, 153, 255, 0.8)'];
             myLineChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: playersMS1.map(item => new Date(item[0])),     //Oś x MS1
                     datasets: [{
                         data: playersMS1.map(item => item[1]),    //Oś x MS1
+                        borderColor: '#00bcd4', // Kolor linii
+                        backgroundColor: 'rgba(0, 188, 212, 0.2)', 
                         borderWidth: 1,
                         pointRadius: 0,     // wielkość punktów wartości Y
                         fill: false,
@@ -59,6 +65,9 @@ let time;
                                 maxTicksLimit: 30,
                                 color: (context) => colorOfDay[new Date(context.tick['label']).getDay()]
                             },
+                            grid: {
+                                color: '#444' 
+                            },
                             font: {
                                 size: 12
                             },
@@ -75,6 +84,10 @@ let time;
                         y: {
                             ticks: {                    //etykiety
                                 beginAtZero: true,
+                                color: '#ffffff' // Kolor etykiet na osi Y
+                            },
+                            grid: {
+                                color: '#444' // Kolor siatki na osi Y
                             },
                             title: {
                                 display: true,
@@ -89,7 +102,10 @@ let time;
                         intersect: false        //Tooltipy pojawiają się nie tylko nad punktami danych
                     },
                     tooltips: {
-                        enabled: true
+                        enabled: true,
+                        backgroundColor: '#333', // Ciemne tło
+                        titleColor: '#ffffff',   // Biały tekst tytułu
+                        bodyColor: '#ffffff'     // Biały tekst tooltipa
                     },
                     plugins: {
                         legend: {
