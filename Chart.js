@@ -164,6 +164,7 @@ async function main() {
     });
     await fetchData("playersHardcore");
     await statsUnpack("playersHardcore");
+    data["playersHardcore"] = data["playersHardcore"].filter(t => t[0] > 1000000000000);
     currentData = data["playersMegasplit"];
 if (originalYMin === undefined || originalYMax === undefined) {
     originalYMin = myLineChart.options.scales.y.min ?? myLineChart.scales.y.min;
